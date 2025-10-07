@@ -8,9 +8,9 @@ import request from "request";
 import handlebars from "handlebars";
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
-const TWITCH_SECRET    = process.env.TWITCH_CLIENT_SECRET;
-const SESSION_SECRET   = '<SOME SECRET HERE>';
-const CALLBACK_URL     = 'http://localhost:3000/auth/twitch/callback';  // You can run locally with - http://localhost:3000/auth/twitch/callback
+const TWITCH_SECRET = process.env.TWITCH_CLIENT_SECRET;
+const SESSION_SECRET = "<SOME SECRET HERE>";
+const CALLBACK_URL = "http://localhost:3000/auth/twitch/callback"; // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 // const oAuth = process.env.TWITCH_CLIENT_SECRET;
 // const nick = `hotimpulse`;
@@ -33,20 +33,22 @@ const CALLBACK_URL     = 'http://localhost:3000/auth/twitch/callback';  // You c
 // });
 
 const app = express();
-app.use(session({secret: SESSION_SECRET, resave: false, saveUninitialized: false}));
-app.use(express.static('public'));
+app.use(
+  session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false })
+);
+app.use(express.static("public"));
 app.use(passport.initialize());
 app.use(passport.session());
 
-OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
+OAuth2Strategy.prototype.userProfile = function (accessToken, done) {
   const options = {
-    url: 'https://api.twitch.tv/helix/users',
-    method: 'GET',
+    url: "https://api.twitch.tv/helix/users",
+    method: "GET",
     headers: {
-      'Client-ID': TWITCH_CLIENT_ID,
-      'Accept': 'application/vnd.twitchtv.v5+json',
-      'Authorization': 'Bearer ' + accessToken
-    }
+      "Client-ID": TWITCH_CLIENT_ID,
+      Accept: "application/vnd.twitchtv.v5+json",
+      Authorization: "Bearer " + accessToken,
+    },
   };
 
   request(options, function (error, response, body) {
@@ -56,36 +58,49 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
       done(JSON.parse(body));
     }
   });
-}
+};
 
-passport.serializeUser(function(user, done) {
-    done(null, user);
+passport.serializeUser(function (user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
-    done(null, user);
+passport.deserializeUser(function (user, done) {
+  done(null, user);
 });
 
-passport.use('twitch', new OAuth2Strategy({
-    authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
-    tokenURL: 'https://id.twitch.tv/oauth2/token',
-    clientID: TWITCH_CLIENT_ID,
-    clientSecret: TWITCH_SECRET,
-    callbackURL: CALLBACK_URL,
-    state: true
-  },
-  function(accessToken, refreshToken, profile, done) {
-    profile.accessToken = accessToken;
-    profile.refreshToken = refreshToken;
+passport.use(
+  "twitch",
+  new OAuth2Strategy(
+    {
+      authorizationURL: "https://id.twitch.tv/oauth2/authorize",
+      tokenURL: "https://id.twitch.tv/oauth2/token",
+      clientID: TWITCH_CLIENT_ID,
+      clientSecret: TWITCH_SECRET,
+      callbackURL: CALLBACK_URL,
+      state: true,
+    },
+    function (accessToken, refreshToken, profile, done) {
+      profile.accessToken = accessToken;
+      profile.refreshToken = refreshToken;
 
-    done(null, profile);
-  }
-));
+      done(null, profile);
+    }
+  )
+);
 
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }));
+app.get(
+  "/auth/twitch",
+  passport.authenticate("twitch", { scope: "user_read" })
+);
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
+app.get(
+  "/auth/twitch/callback",
+  passport.authenticate("twitch", {
+    successRedirect: "/",
+    failureRedirect: "/",
+  })
+);
 
 const template = handlebars.compile(`
 <html><head><title>Twitch Auth Sample</title></head>
@@ -97,14 +112,16 @@ const template = handlebars.compile(`
     <tr><th>Image</th><td>{{logo}}</td></tr>
 </table></html>`);
 
-app.get('/', function (req, res) {
-  if(req.session && req.session.passport && req.session.passport.user) {
+app.get("/", function (req, res) {
+  if (req.session && req.session.passport && req.session.passport.user) {
     res.send(template(req.session.passport.user));
   } else {
-    res.send('<html><head><title>Twitch Auth Sample</title></head><a href="/auth/twitch"><img src="http://ttv-api.s3.amazonaws.com/assets/connect_dark.png"></a></html>');
+    res.send(
+      '<html><head><title>Twitch Auth Sample</title></head><a href="/auth/twitch"><img src="http://ttv-api.s3.amazonaws.com/assets/connect_dark.png"></a></html>'
+    );
   }
 });
 
 app.listen(3000, function () {
-  console.log('Twitch auth sample listening on port 3000!')
+  console.log("Twitch auth sample listening on port 3000!");
 });
