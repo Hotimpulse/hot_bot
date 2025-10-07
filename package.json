@@ -1,0 +1,37 @@
+{
+  "name": "hot_bot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "nodemon": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hotimpulse/hot_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hotimpulse/hot_bot/issues"
+  },
+  "homepage": "https://github.com/Hotimpulse/hot_bot#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "handlebars": "^4.7.8",
+    "nodemon": "^3.1.10",
+    "passport": "^0.7.0",
+    "passport-oauth": "^1.0.0",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
